@@ -28,12 +28,18 @@ if [ -z "${input}" ]; then
   exit 1
 fi
 
+hr="--------------------------------"
+
 if [ "${type}" == "push" ]; then
   message=$(echo "${input}" | \
-  jq -r '
-  .head_commit.timestamp + "\n"
+  jq -r '"\n"
+  + "'"${hr}"'\n"
+  + .head_commit.timestamp + "\n"
   + .pusher.name + " pushed " + (.commits | length | tostring) + " commit(s)" + "\n"
   + "to " + .repository.name + "\n"
+  + "\n"
+  + .head_commit.message + "\n"
+  + "\n"
   + .compare')
 elif [ "${type}" == "issue_comment" ]; then
   message="new issue comment"
@@ -49,7 +55,7 @@ else
 fi
 
 printf "${message}" > /dev/usb/lp0
-printf "\n\n\n" > /dev/usb/lp0
+printf "\n\n\n\n" > /dev/usb/lp0
 
 echo "Content-Type: text/plain"
 echo ""
