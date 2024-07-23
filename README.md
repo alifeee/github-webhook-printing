@@ -18,31 +18,33 @@ chown -R alifeee:www-data .
 apt install nginx fcgiwrap
 service nginx start
 echo 'server {
-        listen 9091;
-        listen [::]:9091;
+        listen 80;
+        listen [::]:80;
 
-        location / {
-          fastcgi_intercept_errors on;
-          include fastcgi_params;
-          fastcgi_param SCRIPT_FILENAME /var/www/cgi/$fastcgi_script_name;
-          fastcgi_pass unix:/var/run/fcgiwrap.socket;
-        }
+	server_name <server-address>;
+
+	location / {
+		fastcgi_intercept_errors on;
+		include fastcgi_params;
+		fastcgi_param SCRIPT_FILENAME /var/www/cgi/$fastcgi_script_name;
+		fastcgi_pass unix:/var/run/fcgiwrap.socket;
+	}
 }' > /etc/nginx/sites-available/githubwebhook
 ln -s /etc/nginx/sites-available/githubwebhook /etc/nginx/sites-enabled/githubwebhook
 nginx -t
-ufw allow 9091
+ufw allow 80
 service nginx restart
 ```
 
 ## Test ping CGI script
 
 ```bash
-curl "http://<server-address>:9091/githubwebhooks/ping.cgi"
+curl "http://<server-address>/githubwebhooks/ping.cgi"
 ```
 
 ## Collect example webhook payloads
 
-Go to a GitHub user, repository, or organisation settings page > webhooks. Add a webhook that points to `http://<server-address>:9091/githubwebhooks/collect.cgi`.
+Go to a GitHub user, repository, or organisation settings page > webhooks. Add a webhook that points to `http://<server-address>/githubwebhooks/hook.cgi`.
 
 Send some webhook requests (by activating GitHub events).
 
@@ -50,17 +52,17 @@ Copy and paste the `env` output and data from the `log` file to files like `webh
 
 ## Test webhook
 
-Set the webhook to point to `http://<server-address>:9091/githubwebhooks/hook.cgi`
+Set the webhook to point to `http://<server-address>/githubwebhooks/hook.cgi`
 
 ```bash
 # push
-curl -s --request POST -i -H "X-GITHUB-EVENT: push" "http://<server-address>:9091/githubwebhooks/hook.cgi" -d "@webhook-examples/push.json"
+curl -s --request POST -i -H "X-GITHUB-EVENT: push" "http://<server-address>/githubwebhooks/hook.cgi" -d "@webhook-examples/push.json"
 # issue_comment
-curl -s --request POST -i -H "X-GITHUB-EVENT: issue_comment" "http://<server-address>:9091/githubwebhooks/hook.cgi" -d "@webhook-examples/issue_comment.json"
+curl -s --request POST -i -H "X-GITHUB-EVENT: issue_comment" "http://<server-address>/githubwebhooks/hook.cgi" -d "@webhook-examples/issue_comment.json"
 # create
-curl -s --request POST -i -H "X-GITHUB-EVENT: create" "http://<server-address>:9091/githubwebhooks/hook.cgi" -d "@webhook-examples/create.json"
+curl -s --request POST -i -H "X-GITHUB-EVENT: create" "http://<server-address>/githubwebhooks/hook.cgi" -d "@webhook-examples/create.json"
 # pull_request
-curl -s --request POST -i -H "X-GITHUB-EVENT: pull_request" "http://<server-address>:9091/githubwebhooks/hook.cgi" -d "@webhook-examples/pull_request.json"
+curl -s --request POST -i -H "X-GITHUB-EVENT: pull_request" "http://<server-address>/githubwebhooks/hook.cgi" -d "@webhook-examples/pull_request.json"
 ```
 
 ## To-do
