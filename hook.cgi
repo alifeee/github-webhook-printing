@@ -54,6 +54,13 @@ else
   exit 1
 fi
 
+if [ ! -e "/dev/usb/lp0" ]; then
+  echo "HTTP/1.0 503 Service Unavailable";
+  echo ""
+  echo "Printer not plugged in"
+  exit 1
+fi
+
 printf "${message}" > /dev/usb/lp0
 printf "\n\n\n\n" > /dev/usb/lp0
 
