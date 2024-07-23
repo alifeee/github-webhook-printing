@@ -42,7 +42,39 @@ if [ "${type}" == "push" ]; then
   + "\n"
   + .compare')
 elif [ "${type}" == "issue_comment" ]; then
-  message="new issue comment"
+  message=$(echo "${input}" | \
+  jq -r '"\n"
+  + "'"${hr}"'\n"
+  + .comment.created_at + "\n"
+  + .repository.name + "\n"
+  + .comment.user.login + " commented on #" + (.issue.number | tostring) + "\n"
+  + "\n"
+  + .comment.body + "\n"
+  + "\n"
+  + .comment.url')
+elif [ "${type}" == "create" ]; then
+  message=$(echo "${input}" | \
+  jq -r '"\n"
+  + "'"${hr}"'\n"
+  + .repository.pushed_at + "\n"
+  + .sender.login + " created a " + .ref_type + "\n"
+  + .ref + "\n"
+  + "  on" + "\n"
+  + .repository.name + "\n"
+  + "\n"
+  + .repository.html_url + "/tree/" + .ref')
+elif [ "${type}" == "pull_request" ]; then
+  message=$(echo "${input}" | \
+  jq -r '"\n"
+  + "'"${hr}"'\n"
+  + .pull_request.created_at + "\n"
+  + .pull_request.user.login + " created pull request " + (.number | tostring) + "\n"
+  + "\n"
+  + .pull_request.title + "\n"
+  + "\n"
+  + .pull_request.body + "\n"
+  + "\n"
+  + .pull_request.url + "\n"')
 else
   echo "HTTP/1.0 501 Not Implemented"
   echo ""
