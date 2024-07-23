@@ -23,7 +23,7 @@ echo 'server {
 
 	server_name <server-address>;
 
-	location / {
+	location /githubwebhooks {
 		fastcgi_intercept_errors on;
 		include fastcgi_params;
 		fastcgi_param SCRIPT_FILENAME /var/www/cgi/$fastcgi_script_name;
